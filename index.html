@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seraphiim</title>
+  <link rel="stylesheet" href="https://cloudflare.com">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    body, html {
+      height: 100%;
+      overflow: hidden;
+      background-color: #050505;
+      color: #fff;
+    }
+
+    #particle-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      will-change: transform;
+      transform: translateZ(0);
+    }
+
+    #enter-screen {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      gap: 14px;
+      padding: 20px;
+      z-index: 10;
+      cursor: pointer;
+      transition: opacity 0.5s ease;
+    }
+
+    .enter-logo {
+      width: 95px;
+      height: 95px;
+      object-fit: contain;
+      margin-bottom: 6px;
+      filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.35));
+    }
+
+    .welcome-text {
+      font-size: 1.5rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+    }
+
+    .enter-subtext {
+      font-size: 0.95rem;
+      color: #bbb;
+      letter-spacing: 3px;
+      text-transform: lowercase;
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      pointer-events: none;
+    }
+
+    .profile-content {
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .username {
+      font-size: 2.4rem;
+      font-weight: bold;
+      letter-spacing: 3px;
+      color: #fff;
+      text-shadow:
+        0 0 10px rgba(255, 255, 255, 0.85),
+        0 0 25px rgba(255, 255, 255, 0.45);
+      margin-bottom: 26px;
+    }
+
+    .socials {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .social-link {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 999px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.1rem;
+      letter-spacing: 1.5px;
+      will-change: transform;
+      transition: transform 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease, text-shadow 0.25s ease;
+    }
+
+    .sparkle-text {
+      position: relative;
+      display: inline-block;
+      text-shadow: 0 0 6px rgba(255, 255, 255, 0.45);
+    }
+
+    .sparkle-text::before,
+    .sparkle-text::after {
+      content: '✦';
+      position: absolute;
+      font-size: 0.65rem;
+      color: #fff;
+      text-shadow: 0 0 6px #fff, 0 0 12px #fff;
+      pointer-events: none;
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+
+    .sparkle-text::before {
+      top: -6px;
+      left: 12%;
+      animation: starTwinkle 2.4s infinite ease-in-out;
+    }
+
+    .sparkle-text::after {
+      bottom: -5px;
+      right: 10%;
+      font-size: 0.55rem;
+      animation: starTwinkle 2.4s infinite ease-in-out 1.2s;
+    }
+
+    .social-link:nth-child(2) .sparkle-text::before { animation-delay: 0.5s; left: 65%; }
+    .social-link:nth-child(2) .sparkle-text::after  { animation-delay: 1.7s; right: 60%; }
+    .social-link:nth-child(3) .sparkle-text::before { animation-delay: 1.0s; left: 30%; }
+    .social-link:nth-child(3) .sparkle-text::after  { animation-delay: 2.1s; right: 20%; }
+    .social-link:nth-child(4) .sparkle-text::before { animation-delay: 0.3s; left: 75%; }
+    .social-link:nth-child(4) .sparkle-text::after  { animation-delay: 1.5s; right: 70%; }
+    .social-link:nth-child(5) .sparkle-text::before { animation-delay: 0.8s; left: 20%; }
+    .social-link:nth-child(5) .sparkle-text::after  { animation-delay: 1.9s; right: 25%; }
+
+    @keyframes starTwinkle {
+      0%, 100% {
+        opacity: 0;
+        transform: scale(0.3) rotate(0deg);
+      }
+      50% {
+        opacity: 0.95;
+        transform: scale(1.15) rotate(45deg);
+      }
+    }
+
+    .social-link:hover {
+      transform: scale(1.08) translateZ(0);
+      background-color: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.22);
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.85);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="enter-screen">
+    <img src="logo.png" alt="Logo" class="enter-logo">
+    <h1 class="welcome-text">GG Welcome Home</h1>
+    <p class="enter-subtext">Click to Enter</p>
+  </div>
+
+  <canvas id="particle-canvas"></canvas>
+
+  <audio id="bg-music" loop preload="auto">
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="container">
+    <div class="profile-content">
+      <div class="username">Seraphiim</div>
+
+            <div class="socials">
+        <a href="https://twitch.tv/the_seraphiim" target="_blank" rel="noopener noreferrer" class="social-link">
+          <i class="fa-brands fa-twitch"></i>
+          <span class="sparkle-text">Twitch</span>
+        </a>
+
+        <a href="https://discord.gg/2FW5KaqkAV" target="_blank" rel="noopener noreferrer" class="social-link">
+          <i class="fa-brands fa-discord"></i>
+          <span class="sparkle-text">Discord</span>
+        </a>
+
+        <a href="https://steamcommunity.com/id/Serephiim/" target="_blank" rel="noopener noreferrer" class="social-link">
+          <i class="fa-brands fa-steam"></i>
+          <span class="sparkle-text">Steam</span>
+        </a>
+
+        <a href="https://the-seraphiim-shop.fourthwall.com/collections/all" target="_blank" rel="noopener noreferrer" class="social-link">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span class="sparkle-text">My Store</span>
+        </a>
+
+        <a href="https://www.tiktok.com/@the_seraphiim" target="_blank" rel="noopener noreferrer" class="social-link">
+          <i class="fa-brands fa-tiktok"></i>
+          <span class="sparkle-text">TikTok</span>
+        </a>
+      </div>
+
+  <script>
+    const overlay = document.getElementById('enter-screen');
+    const music = document.getElementById('bg-music');
+
+    overlay.addEventListener('click', function () {
+      overlay.style.pointerEvents = 'none';
+      overlay.style.opacity = '0';
+      setTimeout(function () {
+        overlay.remove();
+      }, 500);
+
+      if (music) {
+        music.volume = 0.4;
+        const p = music.play();
+        if (p !== undefined) {
+          p.catch(function () {});
+        }
+      }
+    });
+
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d', { alpha: false });
+
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', function () {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    const mouse = { x: null, y: null, radius: 45, radiusSq: 2025 };
+
+    window.addEventListener('mousemove', function (e) {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    }, { passive: true });
+
+    window.addEventListener('mouseleave', function () {
+      mouse.x = null;
+      mouse.y = null;
+    }, { passive: true });
+
+    const particles = [];
+    const particleCount = 110;
+
+    class Particle {
+      constructor() {
+        this.reset(true);
+      }
+
+      reset(initial) {
+        this.x = Math.random() * width;
+        this.y = initial ? Math.random() * height : -10;
+        this.size = Math.random() * 2.2 + 0.8;
+        this.baseSpeedY = Math.random() * 1.6 + 0.6;
+        this.vx = 0;
+        this.vy = this.baseSpeedY;
+        this.opacity = (Math.random() * 0.5 + 0.2).toFixed(2);
+        this.color = 'rgba(255, 255, 255, ' + this.opacity + ')';
+      }
+
+      update() {
+        if (mouse.x !== null && mouse.y !== null) {
+          const dx = this.x - mouse.x;
+          const dy = this.y - mouse.y;
+          const distSq = dx * dx + dy * dy;
+
+          if (distSq < mouse.radiusSq && distSq > 0) {
+            const distance = Math.sqrt(distSq);
+            const force = (mouse.radius - distance) / mouse.radius;
+            this.vx += (dx / distance) * force * 0.45;
+            this.vy += (dy / distance) * force * 0.45;
+          }
+        }
+
+        this.vx *= 0.94;
+        this.vy = this.vy * 0.94 + this.baseSpeedY * 0.06;
+
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.y > height + 10) this.reset(false);
+        if (this.x > width + 10) this.x = -10;
+        if (this.x < -10) this.x = width + 10;
+      }
+
+      draw() {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+
+    function animate() {
+      ctx.fillStyle = '#050505';
+      ctx.fillRect(0, 0, width, height);
+      for (let i = 0; i < particleCount; i++) {
+        particles[i].update();
+        particles[i].draw();
+      }
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
+
