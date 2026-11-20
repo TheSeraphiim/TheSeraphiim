@@ -33,11 +33,12 @@
     }
     .username {
       --bass: 0; font-size: 2.5rem; font-weight: bold; letter-spacing: 3px; color: #fff;
-      transform: translateZ(28px) scale(calc(1 + var(--bass) * 0.04));
+      transform: translateZ(28px) scale(calc(1 + var(--bass) * 0.12));
       text-shadow:
-        0 0 calc(10px + var(--bass) * 18px) rgba(255, 255, 255, calc(0.85 + var(--bass) * 0.15)),
-        0 0 calc(25px + var(--bass) * 35px) rgba(255, 255, 255, calc(0.45 + var(--bass) * 0.45));
-      margin-bottom: 26px; transition: text-shadow 0.06s linear;
+        0 0 calc(10px + var(--bass) * 28px) rgba(255, 255, 255, calc(0.85 + var(--bass) * 0.15)),
+        0 0 calc(25px + var(--bass) * 55px) rgba(255, 255, 255, calc(0.45 + var(--bass) * 0.55)),
+        0 0 calc(40px + var(--bass) * 85px) rgba(255, 255, 255, calc(0.15 + var(--bass) * 0.65));
+      margin-bottom: 26px; transition: text-shadow 0.05s linear, transform 0.05s linear;
     }
     .socials { display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; gap: 16px; transform: translateZ(14px); }
     .social-link {
@@ -255,11 +256,12 @@
       ctx.fillStyle = '#050505';
       ctx.fillRect(0, 0, width, height);
 
-      if (analyser && dataArray && !music.paused) {
+       if (analyser && dataArray && !music.paused) {
         analyser.getByteFrequencyData(dataArray);
         let bassSum = 0;
         for (let b = 0; b < 6; b++) bassSum += dataArray[b];
-        usernameEl.style.setProperty('--bass', Math.pow((bassSum / 6) / 255, 1.6).toFixed(3));
+        const boosted = Math.min(1, Math.pow((bassSum / 6) / 255, 1.1) * 1.35);
+        usernameEl.style.setProperty('--bass', boosted.toFixed(3));
       }
 
       for (let i = 0; i < particleCount; i++) { particles[i].update(); particles[i].draw(); }
