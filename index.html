@@ -4,162 +4,60 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Seraphiim</title>
+  <link rel="icon" type="image/png" href="logo.png">
   <link rel="stylesheet" href="https://cloudflare.com">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Courier New', Courier, monospace;
-    }
-
-    body, html {
-      height: 100%;
-      overflow: hidden;
-      background-color: #050505;
-      color: #fff;
-    }
-
-    #particle-canvas {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      will-change: transform;
-      transform: translateZ(0);
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', Courier, monospace; }
+    body, html { height: 100%; overflow: hidden; background: #050505; color: #fff; }
+    #particle-canvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; transform: translateZ(0); }
 
     #enter-screen {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.95);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      gap: 14px;
-      padding: 20px;
-      z-index: 10;
-      cursor: pointer;
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95);
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      text-align: center; gap: 14px; padding: 20px; z-index: 10; cursor: pointer;
       transition: opacity 0.5s ease;
     }
-
-    .enter-logo {
-      width: 95px;
-      height: 95px;
-      object-fit: contain;
-      margin-bottom: 6px;
-      filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.35));
-    }
-
-    .welcome-text {
-      font-size: 1.5rem;
-      font-weight: bold;
-      letter-spacing: 2px;
-      text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
-    }
-
-    .enter-subtext {
-      font-size: 0.95rem;
-      color: #bbb;
-      letter-spacing: 3px;
-      text-transform: lowercase;
-      animation: pulse 2s infinite ease-in-out;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 0.5; }
-      50% { opacity: 1; }
-    }
+    .enter-logo { width: 95px; height: 95px; object-fit: contain; margin-bottom: 6px; filter: drop-shadow(0 0 12px rgba(255,255,255,0.35)); }
+    .welcome-text { font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 12px rgba(255,255,255,0.8); }
+    .enter-subtext { font-size: 0.95rem; color: #bbb; letter-spacing: 3px; text-transform: lowercase; animation: pulse 2s infinite ease-in-out; }
+    @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
     .container {
-      position: relative;
-      z-index: 1;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 20px;
-      pointer-events: none;
+      position: relative; z-index: 1; height: 100%;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      text-align: center; padding: 20px; pointer-events: none; perspective: 900px;
     }
-
     .profile-content {
-      pointer-events: auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      pointer-events: auto; display: flex; flex-direction: column; align-items: center;
+      transform-style: preserve-3d; transition: transform 0.12s ease-out;
     }
-
     .username {
-      font-size: 2.4rem;
-      font-weight: bold;
-      letter-spacing: 3px;
-      color: #fff;
+      --bass: 0; font-size: 2.5rem; font-weight: bold; letter-spacing: 3px; color: #fff;
+      transform: translateZ(28px) scale(calc(1 + var(--bass) * 0.04));
       text-shadow:
-        0 0 10px rgba(255, 255, 255, 0.85),
-        0 0 25px rgba(255, 255, 255, 0.45);
-      margin-bottom: 26px;
+        0 0 calc(10px + var(--bass) * 18px) rgba(255, 255, 255, calc(0.85 + var(--bass) * 0.15)),
+        0 0 calc(25px + var(--bass) * 35px) rgba(255, 255, 255, calc(0.45 + var(--bass) * 0.45));
+      margin-bottom: 26px; transition: text-shadow 0.06s linear;
     }
-
-    .socials {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 16px;
-    }
-
+    .socials { display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; gap: 16px; transform: translateZ(14px); }
     .social-link {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 18px;
-      border-radius: 999px;
-      color: #fff;
-      text-decoration: none;
-      font-size: 1.1rem;
-      letter-spacing: 1.5px;
-      will-change: transform;
+      position: relative; display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 18px; border-radius: 999px; color: #fff; text-decoration: none;
+      font-size: 1.1rem; letter-spacing: 1.5px;
       transition: transform 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease, text-shadow 0.25s ease;
     }
-
-    .sparkle-text {
-      position: relative;
-      display: inline-block;
-      text-shadow: 0 0 6px rgba(255, 255, 255, 0.45);
+    .social-link:hover {
+      transform: scale(1.08) translateZ(0); background-color: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.22); text-shadow: 0 0 8px rgba(255, 255, 255, 0.85);
     }
 
-    .sparkle-text::before,
-    .sparkle-text::after {
-      content: '✦';
-      position: absolute;
-      font-size: 0.65rem;
-      color: #fff;
-      text-shadow: 0 0 6px #fff, 0 0 12px #fff;
-      pointer-events: none;
-      opacity: 0;
-      will-change: transform, opacity;
+    .sparkle-text { position: relative; display: inline-block; text-shadow: 0 0 6px rgba(255, 255, 255, 0.45); }
+    .sparkle-text::before, .sparkle-text::after {
+      content: '✦'; position: absolute; font-size: 0.65rem; color: #fff;
+      text-shadow: 0 0 6px #fff, 0 0 12px #fff; pointer-events: none; opacity: 0;
     }
-
-    .sparkle-text::before {
-      top: -6px;
-      left: 12%;
-      animation: starTwinkle 2.4s infinite ease-in-out;
-    }
-
-    .sparkle-text::after {
-      bottom: -5px;
-      right: 10%;
-      font-size: 0.55rem;
-      animation: starTwinkle 2.4s infinite ease-in-out 1.2s;
-    }
-
+    .sparkle-text::before { top: -6px; left: 12%; animation: starTwinkle 2.4s infinite ease-in-out; }
+    .sparkle-text::after { bottom: -5px; right: 10%; font-size: 0.55rem; animation: starTwinkle 2.4s infinite ease-in-out 1.2s; }
     .social-link:nth-child(2) .sparkle-text::before { animation-delay: 0.5s; left: 65%; }
     .social-link:nth-child(2) .sparkle-text::after  { animation-delay: 1.7s; right: 60%; }
     .social-link:nth-child(3) .sparkle-text::before { animation-delay: 1.0s; left: 30%; }
@@ -168,24 +66,17 @@
     .social-link:nth-child(4) .sparkle-text::after  { animation-delay: 1.5s; right: 70%; }
     .social-link:nth-child(5) .sparkle-text::before { animation-delay: 0.8s; left: 20%; }
     .social-link:nth-child(5) .sparkle-text::after  { animation-delay: 1.9s; right: 25%; }
+    @keyframes starTwinkle { 0%, 100% { opacity: 0; transform: scale(0.3) rotate(0deg); } 50% { opacity: 0.95; transform: scale(1.15) rotate(45deg); } }
 
-    @keyframes starTwinkle {
-      0%, 100% {
-        opacity: 0;
-        transform: scale(0.3) rotate(0deg);
-      }
-      50% {
-        opacity: 0.95;
-        transform: scale(1.15) rotate(45deg);
-      }
+    .live-badge {
+      display: none; align-items: center; gap: 5px; margin-left: 4px; padding: 2px 8px;
+      border-radius: 999px; font-size: 0.72rem; font-weight: bold; letter-spacing: 1px; color: #fff;
+      background: linear-gradient(135deg, #ff2a5f, #9146ff); box-shadow: 0 0 10px rgba(255, 42, 95, 0.7);
+      animation: livePulse 1.6s infinite ease-in-out;
     }
-
-    .social-link:hover {
-      transform: scale(1.08) translateZ(0);
-      background-color: rgba(255, 255, 255, 0.08);
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.22);
-      text-shadow: 0 0 8px rgba(255, 255, 255, 0.85);
-    }
+    .live-badge.is-live { display: inline-flex; }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+    @keyframes livePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
   </style>
 </head>
 <body>
@@ -197,65 +88,92 @@
   </div>
 
   <canvas id="particle-canvas"></canvas>
-
-  <audio id="bg-music" loop preload="auto">
-    <source src="music.mp3" type="audio/mpeg">
-  </audio>
+  <audio id="bg-music" loop preload="auto"><source src="music.mp3" type="audio/mpeg"></audio>
 
   <div class="container">
-    <div class="profile-content">
-      <div class="username">Seraphiim</div>
-
-            <div class="socials">
+    <div class="profile-content" id="tilt-card">
+      <div class="username" id="username-glow">Seraphiim</div>
+      <div class="socials">
         <a href="https://twitch.tv/the_seraphiim" target="_blank" rel="noopener noreferrer" class="social-link">
-          <i class="fa-brands fa-twitch"></i>
-          <span class="sparkle-text">Twitch</span>
+          <i class="fa-brands fa-twitch"></i><span class="sparkle-text">Twitch</span>
+          <span class="live-badge" id="twitch-live-badge"><span class="live-dot"></span>LIVE</span>
         </a>
-
         <a href="https://discord.gg/2FW5KaqkAV" target="_blank" rel="noopener noreferrer" class="social-link">
-          <i class="fa-brands fa-discord"></i>
-          <span class="sparkle-text">Discord</span>
+          <i class="fa-brands fa-discord"></i><span class="sparkle-text">Discord</span>
         </a>
-
         <a href="https://steamcommunity.com/id/Serephiim/" target="_blank" rel="noopener noreferrer" class="social-link">
-          <i class="fa-brands fa-steam"></i>
-          <span class="sparkle-text">Steam</span>
+          <i class="fa-brands fa-steam"></i><span class="sparkle-text">Steam</span>
         </a>
-
         <a href="https://the-seraphiim-shop.fourthwall.com/collections/all" target="_blank" rel="noopener noreferrer" class="social-link">
-          <i class="fa-solid fa-bag-shopping"></i>
-          <span class="sparkle-text">My Store</span>
+          <i class="fa-solid fa-bag-shopping"></i><span class="sparkle-text">My Store</span>
         </a>
-
         <a href="https://www.tiktok.com/@the_seraphiim" target="_blank" rel="noopener noreferrer" class="social-link">
-          <i class="fa-brands fa-tiktok"></i>
-          <span class="sparkle-text">TikTok</span>
+          <i class="fa-brands fa-tiktok"></i><span class="sparkle-text">TikTok</span>
         </a>
       </div>
+    </div>
+  </div>
+<script>
+    // 1. Typewriter Tab Title
+    const titleText = 'Seraphiim';
+    let charIndex = 0, isDeleting = false;
+    function animateTabTitle() {
+      const cur = titleText.substring(0, charIndex);
+      document.title = cur.length > 0 ? cur : '\u200E';
+      if (!isDeleting && charIndex < titleText.length) { charIndex++; setTimeout(animateTabTitle, 220); }
+      else if (!isDeleting && charIndex === titleText.length) { isDeleting = true; setTimeout(animateTabTitle, 1500); }
+      else if (isDeleting && charIndex > 0) { charIndex--; setTimeout(animateTabTitle, 120); }
+      else { isDeleting = false; setTimeout(animateTabTitle, 400); }
+    }
+    animateTabTitle();
 
-  <script>
+    // 2. Automatic Twitch Live Check
+    async function checkTwitchLive() {
+      const badge = document.getElementById('twitch-live-badge');
+      if (!badge) return;
+      try {
+        const res = await fetch('https://decapi.me');
+        const txt = (await res.text()).toLowerCase();
+        badge.classList.toggle('is-live', txt && !txt.includes('offline') && !txt.includes('error') && !txt.includes('not found'));
+      } catch (e) { badge.classList.remove('is-live'); }
+    }
+    checkTwitchLive();
+    setInterval(checkTwitchLive, 120000);
+
+    // 3. Entry Overlay + Bass Analyzer
     const overlay = document.getElementById('enter-screen');
     const music = document.getElementById('bg-music');
+    const usernameEl = document.getElementById('username-glow');
+    let analyser = null, dataArray = null;
 
     overlay.addEventListener('click', function () {
       overlay.style.pointerEvents = 'none';
       overlay.style.opacity = '0';
-      setTimeout(function () {
-        overlay.remove();
-      }, 500);
+      setTimeout(function () { overlay.remove(); }, 500);
 
       if (music) {
         music.volume = 0.4;
+        try {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx && !analyser) {
+            const ctxAudio = new AudioCtx();
+            const src = ctxAudio.createMediaElementSource(music);
+            analyser = ctxAudio.createAnalyser();
+            analyser.fftSize = 128;
+            src.connect(analyser);
+            analyser.connect(ctxAudio.destination);
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+          }
+        } catch (e) { analyser = null; }
         const p = music.play();
-        if (p !== undefined) {
-          p.catch(function () {});
-        }
+        if (p !== undefined) p.catch(function () {});
       }
     });
 
+    // 4. 3D Tilt + Stardust Cursor Trail + Radius 45 Falling Dots
     const canvas = document.getElementById('particle-canvas');
     const ctx = canvas.getContext('2d', { alpha: false });
-
+    const tiltCard = document.getElementById('tilt-card');
     let width = canvas.width = window.innerWidth;
     let height = canvas.height = window.innerHeight;
 
@@ -264,86 +182,100 @@
       height = canvas.height = window.innerHeight;
     });
 
-    const mouse = { x: null, y: null, radius: 45, radiusSq: 2025 };
+    const mouse = { x: null, y: null, radius: 45, radiusSq: 2025, normX: 0, normY: 0 };
+    const sparkles = [];
+    let lastSparkleTime = 0;
 
     window.addEventListener('mousemove', function (e) {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
+      mouse.x = e.clientX; mouse.y = e.clientY;
+      mouse.normX = (e.clientX / width - 0.5) * 2;
+      mouse.normY = (e.clientY / height - 0.5) * 2;
+
+      if (tiltCard) {
+        tiltCard.style.transform = 'rotateX(' + (-mouse.normY * 10).toFixed(2) + 'deg) rotateY(' + (mouse.normX * 10).toFixed(2) + 'deg)';
+      }
+
+      const now = performance.now();
+      if (now - lastSparkleTime > 28) {
+        lastSparkleTime = now;
+        sparkles.push({
+          x: e.clientX + (Math.random() - 0.5) * 8,
+          y: e.clientY + (Math.random() - 0.5) * 8,
+          vx: (Math.random() - 0.5) * 0.6,
+          vy: (Math.random() - 0.5) * 0.6 + 0.35,
+          size: Math.random() * 6 + 7, alpha: 1, rotation: Math.random() * Math.PI
+        });
+      }
     }, { passive: true });
 
     window.addEventListener('mouseleave', function () {
-      mouse.x = null;
-      mouse.y = null;
+      mouse.x = null; mouse.y = null; mouse.normX = 0; mouse.normY = 0;
+      if (tiltCard) tiltCard.style.transform = 'rotateX(0deg) rotateY(0deg)';
     }, { passive: true });
 
-    const particles = [];
-    const particleCount = 110;
-
+    const particles = [], particleCount = 110;
     class Particle {
-      constructor() {
-        this.reset(true);
-      }
-
+      constructor() { this.reset(true); }
       reset(initial) {
         this.x = Math.random() * width;
         this.y = initial ? Math.random() * height : -10;
         this.size = Math.random() * 2.2 + 0.8;
         this.baseSpeedY = Math.random() * 1.6 + 0.6;
-        this.vx = 0;
-        this.vy = this.baseSpeedY;
-        this.opacity = (Math.random() * 0.5 + 0.2).toFixed(2);
-        this.color = 'rgba(255, 255, 255, ' + this.opacity + ')';
+        this.vx = 0; this.vy = this.baseSpeedY;
+        this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.2).toFixed(2) + ')';
       }
-
       update() {
         if (mouse.x !== null && mouse.y !== null) {
-          const dx = this.x - mouse.x;
-          const dy = this.y - mouse.y;
-          const distSq = dx * dx + dy * dy;
-
+          const dx = this.x - mouse.x, dy = this.y - mouse.y, distSq = dx * dx + dy * dy;
           if (distSq < mouse.radiusSq && distSq > 0) {
-            const distance = Math.sqrt(distSq);
-            const force = (mouse.radius - distance) / mouse.radius;
-            this.vx += (dx / distance) * force * 0.45;
-            this.vy += (dy / distance) * force * 0.45;
+            const dist = Math.sqrt(distSq), force = (mouse.radius - dist) / mouse.radius;
+            this.vx += (dx / dist) * force * 0.45;
+            this.vy += (dy / dist) * force * 0.45;
           }
         }
-
         this.vx *= 0.94;
         this.vy = this.vy * 0.94 + this.baseSpeedY * 0.06;
-
-        this.x += this.vx;
-        this.y += this.vy;
-
+        this.x += this.vx - mouse.normX * 0.25;
+        this.y += this.vy - mouse.normY * 0.25;
         if (this.y > height + 10) this.reset(false);
         if (this.x > width + 10) this.x = -10;
         if (this.x < -10) this.x = width + 10;
       }
-
       draw() {
         ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
       }
     }
+    for (let i = 0; i < particleCount; i++) particles.push(new Particle());
 
-    for (let i = 0; i < particleCount; i++) {
-      particles.push(new Particle());
-    }
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
 
     function animate() {
       ctx.fillStyle = '#050505';
       ctx.fillRect(0, 0, width, height);
-      for (let i = 0; i < particleCount; i++) {
-        particles[i].update();
-        particles[i].draw();
+
+      if (analyser && dataArray && !music.paused) {
+        analyser.getByteFrequencyData(dataArray);
+        let bassSum = 0;
+        for (let b = 0; b < 6; b++) bassSum += dataArray[b];
+        usernameEl.style.setProperty('--bass', Math.pow((bassSum / 6) / 255, 1.6).toFixed(3));
+      }
+
+      for (let i = 0; i < particleCount; i++) { particles[i].update(); particles[i].draw(); }
+
+      for (let s = sparkles.length - 1; s >= 0; s--) {
+        const sp = sparkles[s];
+        sp.x += sp.vx; sp.y += sp.vy; sp.alpha -= 0.025; sp.rotation += 0.03;
+        if (sp.alpha <= 0) { sparkles.splice(s, 1); continue; }
+        ctx.save(); ctx.translate(sp.x, sp.y); ctx.rotate(sp.rotation);
+        ctx.font = sp.size.toFixed(1) + 'px monospace';
+        ctx.fillStyle = 'rgba(255, 255, 255, ' + sp.alpha.toFixed(2) + ')';
+        ctx.fillText('✦', 0, 0); ctx.restore();
       }
       requestAnimationFrame(animate);
     }
-
     animate();
   </script>
 </body>
 </html>
-
